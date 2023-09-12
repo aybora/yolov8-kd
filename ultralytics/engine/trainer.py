@@ -318,8 +318,8 @@ class BaseTrainer:
         if self.args.teacher_weight:
             dump_image = torch.zeros((1, 3, self.args.imgsz, self.args.imgsz), device=self.device)
             targets = torch.Tensor([[0, 0, 0, 0, 0, 0]]).to(self.device)
-            _, features, _ = self.model.predict(dump_image, target=targets)  # forward
-            _, teacher_feature, _ = self.teacher_model.predict(dump_image, target=targets) 
+            _, features, _ = self.model.module.predict(dump_image, target=targets)  # forward
+            _, teacher_feature, _ = self.teacher_model.module.predict(dump_image, target=targets) 
 
             _, student_channel, student_out_size, _ = features.shape
             _, teacher_channel, teacher_out_size, _ = teacher_feature.shape
@@ -512,14 +512,12 @@ class BaseTrainer:
             return
 
         model, weights = self.teacher_model, None
-        print(self.teacher_model)
         teacher_ckpt = None
         if str(model).endswith('.pt'):
             weights, teacher_ckpt = attempt_load_one_weight(model)
             cfg = teacher_ckpt['model'].yaml
         else:
             cfg = model
-        print(self.teacher_model)
         self.teacher_model = self.get_model(cfg=cfg, weights=weights, verbose=RANK == -1)  # calls Model(cfg, weights)
         return teacher_ckpt
 
