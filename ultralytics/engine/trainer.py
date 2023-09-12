@@ -372,8 +372,8 @@ class BaseTrainer:
                     batch = self.preprocess_batch(batch)
                     targets = torch.cat((batch['batch_idx'].view(-1, 1), batch['cls'].view(-1, 1), batch['bboxes']), 1).to(self.device)
                     if self.args.teacher_weight:
-                        _, features, _ = self.model.predict(batch['img'], target=targets)  # forward
-                        _, teacher_feature, mask = self.teacher_model.predict(batch['img'], target=targets)
+                        _, features, _ = self.model.module.predict(batch['img'], target=targets)  # forward
+                        _, teacher_feature, mask = self.teacher_model.module.predict(batch['img'], target=targets)
                         self.loss, self.loss_items = self.model(batch, teacher=teacher_feature.detach(), student=stu_feature_adapt(features), mask=mask.detach())  # loss scaled by batch_size
                     	
                     else:	
