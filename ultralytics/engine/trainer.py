@@ -318,8 +318,8 @@ class BaseTrainer:
         if self.args.teacher_weight:
             dump_image = torch.zeros((1, 3, self.args.imgsz, self.args.imgsz), device=self.device)
             targets = torch.Tensor([[0, 0, 0, 0, 0, 0]]).to(self.device)
-            _, features, _ = self.model.module.predict(dump_image, target=targets)  # forward
-            _, teacher_feature, _ = self.teacher_model.module.predict(dump_image, target=targets) 
+            _, features, _ = self.model.predict(dump_image, target=targets)  # forward
+            _, teacher_feature, _ = self.teacher_model.predict(dump_image, target=targets) 
 
             _, student_channel, student_out_size, _ = features.shape
             _, teacher_channel, teacher_out_size, _ = teacher_feature.shape
@@ -372,8 +372,8 @@ class BaseTrainer:
                     batch = self.preprocess_batch(batch)
                     targets = torch.cat((batch['batch_idx'].view(-1, 1), batch['cls'].view(-1, 1), batch['bboxes']), 1).to(self.device)
                     if self.args.teacher_weight:
-                        _, features, _ = self.model.module.predict(batch['img'], target=targets)  # forward
-                        _, teacher_feature, mask = self.teacher_model.module.predict(batch['img'], target=targets)
+                        _, features, _ = self.model.predict(batch['img'], target=targets)  # forward
+                        _, teacher_feature, mask = self.teacher_model.predict(batch['img'], target=targets)
                         self.loss, self.loss_items = self.model(batch, teacher=teacher_feature.detach(), student=stu_feature_adapt(features), mask=mask.detach())  # loss scaled by batch_size
                     	
                     else:	
